@@ -1,0 +1,10 @@
+#title-logo {
+    max-width: 20%;
+    height: auto;
+}
+
+#title {
+    font-family: 'Segoe Print', 'Bradley Hand', Chilanka, TSCu_Comic, casual, cursive;
+    font-weight: bold;
+    color: darkcyan;
+}
