@@ -1,13 +1,15 @@
 import { Component, signal } from '@angular/core';
 import { HeaderComponent } from './header/header';
-import { Lists } from './lists/lists';
+import {TodoPage} from './todo-page/todo-page';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [HeaderComponent,Lists],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
+
 export class App {
   protected readonly title = signal('TodoListAng');
 }
