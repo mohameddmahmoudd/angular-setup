@@ -1,1 +1,6 @@
-<p>todo-item works!</p>
+<div class="item" [class.completed]="todo.completed">
+<input type="checkbox" [checked]="todo.completed" (change)="toggle()" [disabled]="busy" />
+<span>{{ todo.title }}</span>
+<button (click)="remove()" [disabled]="busy">×</button>
+<button (click)="toggle()" [disabled]="busy">Toggle</button>
+</div>

@@ -3,20 +3,18 @@ import { TodoService } from '../todo.service';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { addExportToModule } from '@angular/cdk/schematics';
 import { TodoItem } from '../todo-item/todo-item';
-import { TodoList } from '../todo-list/todo-list';
 import { combineLatest, map, Observable, startWith } from 'rxjs';
-import { Todo } from '../types'; 
+import { Todo } from '../types';
+import { HeaderComponent } from "../header/header"; 
 
 @Component({
   selector: 'app-todo-page',
+  standalone: true,
   imports: [CommonModule,
     ReactiveFormsModule,
     DragDropModule,
-    TodoItem,
-    TodoList
-  ],
+    TodoItem, HeaderComponent],
   templateUrl: './todo-page.html',
   styleUrl: './todo-page.css'
 })
@@ -25,6 +23,8 @@ export class TodoPage {
   private todoService: TodoService;
   pendingSearch = new FormControl('', { nonNullable: true });
   completedSearch = new FormControl('', { nonNullable: true });
+  title = new FormControl('', { nonNullable: true });
+  loading = false;
 
   readonly pending$: Observable<Todo[]>;
   readonly completed$: Observable<Todo[]>;
@@ -52,10 +52,13 @@ export class TodoPage {
   dropPending(ev: CdkDragDrop<Todo[]>) 
   {
     // Reorder in-pending list (client-side only)
+    const from = ev.previousContainer.data ?? [];
+    const to = ev.container.data ?? [];
+
     if (ev.previousContainer === ev.container) {
-      moveItemInArray(ev.container.data, ev.previousIndex, ev.currentIndex);
+      moveItemInArray(to, ev.previousIndex, ev.currentIndex);
     } else {
-      const todo = ev.previousContainer.data[ev.previousIndex];
+      const todo = from[ev.previousIndex];
       if (todo.completed) {
         this.todoService.update(todo.id, { completed: false }).subscribe();
       }
@@ -64,8 +67,11 @@ export class TodoPage {
 
   dropCompleted(ev: CdkDragDrop<Todo[]>)
   {
+    const from = ev.previousContainer.data ?? [];
+    const to = ev.container.data ?? [];
+    
     if( ev.previousContainer === ev.container) {
-      moveItemInArray(ev.container.data, ev.previousIndex, ev.currentIndex);
+      moveItemInArray(to, ev.previousIndex, ev.currentIndex);
     } else {
       const todo = ev.previousContainer.data[ev.previousIndex];
       if (!todo.completed) {
@@ -75,7 +81,22 @@ export class TodoPage {
 
   }
 
- 
+  add() {
+    const value = this.title.value?.trim();
+    if (!value) return;
+    this.loading = true;
+    this.todoService.add(value).subscribe({
+      next: () => {
+        this.title.setValue('');
+        this.loading = false;
+      },
+      error: () => (this.loading = false),
+    });
+  }
+
+  trackById(_index: number, t: Todo) {
+  return t.id;
+}
 
 
 }

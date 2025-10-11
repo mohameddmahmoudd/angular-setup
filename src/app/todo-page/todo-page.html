@@ -1,1 +1,53 @@
-<p>todo-page works!</p>
+<div>
+
+    <app-header></app-header>
+
+    <div class="todo-add">
+    <form class="add-form" (ngSubmit)="add()">
+        <input [formControl]="title" placeholder="Tasks for today" autofocus />
+        <button type="submit" [disabled]="title.invalid">Add</button>
+    </form>
+    </div>
+
+    <div class="lists">
+        <div class="list">
+            <h2>Completed</h2>
+            <input [formControl] = "completedSearch" placeholder="Search completed tasks" />
+            <div
+                cdkDropList
+                [cdkDropListData]="(completed$ | async) ?? []"
+                (cdkDropListDropped)="dropCompleted($event)"
+                class="dropzone">
+                    <ng-container *ngIf="(completed$ | async) as completed; else emptyCompleted">
+                    <div *ngFor="let t of completed; trackBy: trackById" cdkDrag>
+                    <app-todo-item [todo]="t"></app-todo-item>
+            </div>
+                </ng-container>
+                <ng-template #emptyCompleted>
+                <div class="empty">No completed items</div>
+                </ng-template>
+        </div>
+        </div>
+
+        <div class="list">
+            <h2>Pending</h2>
+            <input [formControl]="pendingSearch" placeholder="Search pending tasks" />
+            <div
+                cdkDropList
+                [cdkDropListData]="(pending$ | async) ?? []"
+                (cdkDropListDropped)="dropPending($event)"
+                class="dropzone">
+                    <ng-container *ngIf="(pending$ | async) as pending; else emptyPending">
+                    <div *ngFor="let t of pending; trackBy: trackById" cdkDrag>
+                    <app-todo-item [todo]="t"></app-todo-item>
+            </div>
+                </ng-container>
+                <ng-template #emptyPending>
+                <div class="empty">No pending items</div>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+
+
+</div>
